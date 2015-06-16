@@ -401,6 +401,24 @@
  *	@inode contains a pointer to the inode.
  *	@secid contains a pointer to the location where result will be saved.
  *	In case of failure, @secid will be set to zero.
+ * @inode_copy_up:
+ *	Appropriately label the destination inode when a unioned file is copied
+ *	up from a lower layer to the union/overlay layer.
+ *	@src indicates the file that is being copied up.
+ *	@dst indicates the file that has being created by the copy up.
+ *	Returns 0 on success or a negative error code on error.
+ * @inode_copy_up_xattr:
+ *	Filter/modify the xattrs being copied up when a unioned file is copied
+ *	up from a lower layer to the union/overlay layer.
+ *	@src indicates the file that is being copied up.
+ *	@dst indicates the file that has being created by the copy up.
+ *	@name indicates the name of the xattr.
+ *	@value, *@size indicate the payload of the xattr.
+ *	Returns 0 to accept the xattr, 1 to discard the xattr or a negative
+ *	error code to abort the copy up.  The xattr buffer must be at least
+ *	XATTR_SIZE_MAX in capacity and the contents may be modified and *@size
+ *	changed appropriately.  Note that the caller is responsible for reading
+ *	and writing the xattrs as this hook is merely a filter.
  *
  * Security hooks for file operations
  *
@@ -1425,6 +1443,9 @@ union security_list_options {
 	int (*inode_listsecurity)(struct inode *inode, char *buffer,
 					size_t buffer_size);
 	void (*inode_getsecid)(struct inode *inode, u32 *secid);
+	int (*inode_copy_up) (struct dentry *src, struct dentry *dst);
+	int (*inode_copy_up_xattr) (struct dentry *src, struct dentry *dst,
+				    const char *name, void *value, size_t *size);
 
 	int (*file_permission)(struct file *file, int mask);
 	int (*file_alloc_security)(struct file *file);
@@ -1694,6 +1715,8 @@ struct security_hook_heads {
 	struct list_head inode_setsecurity;
 	struct list_head inode_listsecurity;
 	struct list_head inode_getsecid;
+	struct list_head inode_copy_up;
+	struct list_head inode_copy_up_xattr;
 	struct list_head file_permission;
 	struct list_head file_alloc_security;
 	struct list_head file_free_security;

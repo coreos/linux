@@ -70,6 +70,14 @@ retry:
 			value_size = size;
 			goto retry;
 		}
+		error = security_inode_copy_up_xattr(old, new,
+						     name, value, &size);
+		if (error < 0)
+			break;
+		if (error == 1) {
+			error = 0;
+			continue; /* Discard */
+		}
 
 		error = vfs_setxattr(new, name, value, size, 0);
 		if (error)
@@ -232,6 +240,10 @@ static int ovl_copy_up_locked(struct dentry *workdir, struct dentry *upperdir,
 	stat->mode = mode;
 	if (err)
 		goto out2;
+
+	err = security_inode_copy_up(lowerpath->dentry, newdentry);
+	if (err < 0)
+		goto out_cleanup;
 
 	if (S_ISREG(stat->mode)) {
 		struct path upperpath;

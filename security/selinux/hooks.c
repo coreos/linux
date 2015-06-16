@@ -1745,6 +1745,7 @@ static int file_has_perm(const struct cred *cred,
 			 struct file *file,
 			 u32 av)
 {
+	struct inode_security_struct *isec;
 	struct file_security_struct *fsec = file->f_security;
 	struct inode *inode = file_inode(file);
 	struct common_audit_data ad;
@@ -1765,8 +1766,15 @@ static int file_has_perm(const struct cred *cred,
 
 	/* av is zero if only checking access to the descriptor. */
 	rc = 0;
-	if (av)
-		rc = inode_has_perm(cred, inode, av, &ad);
+	if (av && likely(!IS_PRIVATE(inode))) {
+		if (fsec->union_isid) {
+			isec = inode->i_security;
+			rc = avc_has_perm(sid, fsec->union_isid, isec->sclass,
+					  av, &ad);
+		}
+		if (!rc)
+			rc = inode_has_perm(cred, inode, av, &ad);
+	}
 
 out:
 	return rc;

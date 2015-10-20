@@ -70,6 +70,19 @@ retry:
 			value_size = size;
 			goto retry;
 		}
+
+		if (size > value_size) {
+			void *new;
+			new = krealloc(value, size, GFP_KERNEL);
+			if (!new) {
+				error = -ENOMEM;
+				goto out_free_value;
+			}
+			value = new;
+			value_size = size;
+			goto retry;
+		}
+
 		error = security_inode_copy_up_xattr(old, new,
 						     name, value, &size);
 		if (error < 0)

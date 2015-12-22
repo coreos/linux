@@ -163,6 +163,9 @@ int ovl_permission(struct inode *inode, int mask)
 			goto out_dput;
 	}
 
+	if (!is_upper)
+		mask |= MAY_OPEN_LOWER;
+
 	err = __inode_permission(realinode, mask);
 out_dput:
 	dput(alias);

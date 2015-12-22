@@ -2967,6 +2967,15 @@ static int selinux_inode_permission(struct inode *inode, int mask)
 	u32 audited, denied;
 
 	from_access = mask & MAY_ACCESS;
+
+	/*
+	 * If we're trying to open the lower layer of an overlay mount, don't
+	 * worry about write or append permissions - these will be verified
+	 * against the upper context
+	 */
+	if (mask & MAY_OPEN_LOWER)
+		mask &= ~(MAY_WRITE|MAY_APPEND);
+
 	mask &= (MAY_READ|MAY_WRITE|MAY_EXEC|MAY_APPEND);
 
 	/* No permission to check.  Existence test. */

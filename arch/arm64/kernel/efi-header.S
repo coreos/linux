@@ -103,6 +103,11 @@ section_table:
 
 	.set	section_count, (. - section_table) / 40
 
+	/* CoreOS 64 byte verity hash value. */
+	.org	_head + 512
+	.ascii	"verity-hash"
+	.org	_head + 512 + 64
+
 #ifdef CONFIG_DEBUG_EFI
 	/*
 	 * The debug table is referenced via its Relative Virtual Address (RVA),

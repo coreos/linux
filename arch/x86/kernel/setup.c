@@ -69,6 +69,7 @@
 #include <linux/crash_dump.h>
 #include <linux/tboot.h>
 #include <linux/jiffies.h>
+#include <linux/security.h>
 
 #include <linux/usb/xhci-dbgp.h>
 #include <video/edid.h>
@@ -1183,7 +1184,13 @@ void __init setup_arch(char **cmdline_p)
 			pr_info("Secure boot disabled\n");
 			break;
 		case efi_secureboot_mode_enabled:
-			pr_info("Secure boot enabled\n");
+			set_bit(EFI_SECURE_BOOT, &efi.flags);
+			if (IS_ENABLED(CONFIG_EFI_SECURE_BOOT_LOCK_DOWN)) {
+				lock_kernel_down();
+				pr_info("Secure boot enabled and kernel locked down\n");
+			} else {
+				pr_info("Secure boot enabled\n");
+			}
 			break;
 		default:
 			pr_info("Secure boot could not be determined\n");

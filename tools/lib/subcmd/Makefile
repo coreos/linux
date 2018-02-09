@@ -33,6 +33,9 @@ ifneq ($(WERROR),0)
   CFLAGS += -Werror
 endif
 
+# Don't fail on fallthrough with newer GCCs.
+CFLAGS += -Wno-error=implicit-fallthrough
+
 CFLAGS += -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
 
 CFLAGS += -I$(srctree)/tools/include/

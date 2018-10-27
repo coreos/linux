@@ -24,6 +24,7 @@ obj-$(CONFIG_NETFILTER_NETLINK_OSF) += nfnetlink_osf.o
 
 # connection tracking
 obj-$(CONFIG_NF_CONNTRACK) += nf_conntrack.o
+obj-$(CONFIG_NF_CONNTRACK_IPV4_COMPAT) += nf_conntrack_ipv4.o
 
 obj-$(CONFIG_NF_CT_PROTO_GRE) += nf_conntrack_proto_gre.o
 

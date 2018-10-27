@@ -70,6 +70,14 @@ config NF_CONNTRACK
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
+config NF_CONNTRACK_IPV4_COMPAT
+	tristate "Netfilter connection tracking IPv4 compatibility module"
+	depends on NF_CONNTRACK
+	default NF_CONNTRACK
+	help
+	  Compatibility nf_conntrack_ipv4 module that loads nf_conntrack.ko,
+	  since kube-proxy cares about the names of loaded kernel modules.
+
 config NF_LOG_COMMON
 	tristate
 

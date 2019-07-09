@@ -1289,12 +1289,6 @@ static int ovl_get_lower_layers(struct super_block *sb, struct ovl_fs *ofs,
 		if (err < 0)
 			goto out;
 
-		err = -EBUSY;
-		if (ovl_is_inuse(stack[i].dentry)) {
-			pr_err("overlayfs: lowerdir is in-use as upperdir/workdir\n");
-			goto out;
-		}
-
 		err = ovl_setup_trap(sb, stack[i].dentry, &trap, "lowerdir");
 		if (err)
 			goto out;
